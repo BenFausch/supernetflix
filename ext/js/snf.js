@@ -1,64 +1,64 @@
 //TODO:
 //handle empty returns from all api queries, handle tv shows
 //search for movies by title
-function movieSearch(query, that) {
-     
+function movieSearch(query, year) {
     let title = encodeURIComponent(query);
     console.log(title)
-
     let movieId = '';
     theMovieDb.search.getMovie({
-        "query": title
+        "query": title,
+        "year": year
     }, function(data) {
         data = JSON.parse(data)
         if (typeof data.results[0] !== 'undefined') {
             let id = data.results[0].id;
             console.log('id is ' + id)
             closeModal()
-            console.log('year is '+ $('.year').text())
+            console.log('year is ' + $('.year').text())
             getMovieTrailer(id)
-            getMovieById(id, that)
+            getMovieById(id)
         } else {
             console.log('moviesearchError, checking TV')
             closeModal()
-            tvSearch(title, that)
+            tvSearch(title)
         }
     }, function(error) {
         console.log(error)
     })
 }
 
-function getMovieById(id, that) {
+function getMovieById(id) {
     theMovieDb.movies.getById({
         "id": id
     }, function(data) {
         console.log(JSON.parse(data))
         data = JSON.parse(data)
-        getOMDB(data.imdb_id, data.title, data.release_date, that)
+        getOMDB(data.imdb_id, data.title, data.release_date)
     }, function(error) {})
 }
 
-function getTvById(id, that) {
+function getTvById(id) {
     theMovieDb.tv.getById({
         "id": id
     }, function(data) {
         console.log(JSON.parse(data))
         data = JSON.parse(data)
-        // getOMDB(data.imdb_id, data.title, data.release_date, that)
-        $('.jawBoneContent.open .jawbone-overview-info .listMeta').after('<p class="snf-trailer"><a href="' + data.homepage + '" target="_blank">Show Homepage</a></button>')
-        $('.jawBoneContent.open .jawbone-overview-info .listMeta').unbind().after('<p class="snf-ratings">TheMovieDatabase : <span>' + data.vote_average + '</span></p>')
+        // getOMDB(data.imdb_id, data.title, data.release_date)
+        $(".jawBoneFadeInPlaceContainer").unbind().find('.synopsis').after('<p class="snf-trailer"><a href="' + data.homepage + '" target="_blank">Show Homepage</a></button>')
+        $(".jawBoneFadeInPlaceContainer").unbind().find('.synopsis').unbind().after('<p class="snf-ratings">TheMovieDatabase : <span>' + data.vote_average + '</span></p>')
     }, function(error) {})
 }
 
-function tvSearch(query, that) {
+function tvSearch(query, year) {
     theMovieDb.search.getTv({
-        "query": query
+        "query": query,
+        "first_air_date_year": year
     }, function(data) {
         console.log('searching tv for ' + query)
         console.log(JSON.parse(data))
         data = JSON.parse(data)
         if (data.total_results > 0) {
-            getTvById(data.results[0].id, that)
+            getTvById(data.results[0].id)
         } else {
             console.log('no moviedb results, searching OMDB')
             searchOMDB(query);
@@ -73,20 +73,20 @@ function getMovieTrailer(movieId) {
     }, function(data) {
         console.log(data)
         data = JSON.parse(data)
-        if(data.youtube[0]){
-                let youtube = data.youtube[0].source
-                console.log(youtube)
-                if ($('.snf-trailer').length > 0) {
-                    $('.snf-trailer').remove()
-                }
-                $('.jawBoneContent.open .jawbone-overview-info .listMeta').after('<p class="snf-trailer" id="' + youtube + '"><a href="https://www.youtube.com/watch?v=' + youtube + '" target="_blank">Official Trailer</a></button>')
+        if (data.youtube[0]) {
+            let youtube = data.youtube[0].source
+            console.log(youtube)
+            if ($('.snf-trailer').length > 0) {
+                $('.snf-trailer').remove()
             }
+            $(".jawBoneFadeInPlaceContainer").unbind().find('.synopsis').after('<p class="snf-trailer" id="' + youtube + '"><a href="https://www.youtube.com/watch?v=' + youtube + '" target="_blank">Official Trailer</a></button>')
+        }
     }, function(error) {
         console.log(error)
     })
 }
 
-function getOMDB(imdb, title, date, that) {
+function getOMDB(imdb, title, date) {
     console.log('getOMDB' + imdb + title + date)
     let omdb = '';
     if (imdb.length < 1) {
@@ -99,13 +99,11 @@ function getOMDB(imdb, title, date, that) {
     $.get(omdb).then(function(data) {
         console.log('omdb data')
         console.log(data)
-        console.log('current selector')
-        console.log(that)
         if ($('.snf-ratings').length > 0) {
             $('.snf-ratings').remove()
         }
         data.Ratings.forEach(function(rating) {
-            $('.jawBoneContent.open .jawbone-overview-info .listMeta').unbind().after('<p class="snf-ratings">' + rating.Source + ' : <span>' + rating.Value + '</span></p>')
+            $(".jawBoneFadeInPlaceContainer").unbind().find('.synopsis').after('<p class="snf-ratings">' + rating.Source + ' : <span>' + rating.Value + '</span></p>')
         })
     })
 }
@@ -114,6 +112,12 @@ function searchOMDB(title) {
     let omdb = 'https://www.omdbapi.com/?t=' + title + '&apikey=f74062e1'
     $.get(omdb).then(function(data) {
         console.log(data)
+        if (data.Response === 'True') {
+            data.Ratings.forEach(function(rating) {
+                console.log(rating)
+                $(".jawBoneFadeInPlaceContainer").unbind().find('.synopsis').after('<p class="snf-ratings">' + rating.Source + ' : <span>' + rating.Value + '</span></p>')
+            })
+        }
     })
 }
 
@@ -122,33 +126,47 @@ function closeModal() {
     $('.snf-ratings').remove()
     $('.snf-trailer').remove()
 }
+
+function searchQuery(title) {
+    console.log('selected title: ' + title)
+    setTimeout(function() {
+        let year = $(".jawBoneFadeInPlaceContainer").find('.year').text();
+        let rating = $(".jawBoneFadeInPlaceContainer").find('.maturity-number').text();
+        console.log('rating: ' + rating)
+        console.log('year: ' + year)
+        if (rating.indexOf('TV') < 0) {
+            movieSearch(title, year);
+        } else {
+            tvSearch(title, year)
+        }
+    }, 1500);
+}
 $(document).ready(function() {
     //on hover over title card
     $('.slider-item').unbind().on('mouseenter', function() {
-        console.log('title card')
-        setTimeout(function() {
-            var result = document.getElementsByClassName("jawBoneFadeInPlaceContainer")[0].innerHTML;
-            console.log(result);
-            console.log('tv rating: '+$(".jawBoneFadeInPlaceContainer").find('.maturity-number').text())
- 
-        },3000)
+        // console.log('title card')
         let title = $(this).find('.video-preload-title-label').text();
         title = title.replace(/ *\([^)]*\) */g, "").replace(/[^A-Z0-9]/ig, "-");
-        setTimeout(function() {
-            movieSearch(title, this);
-        }, 1500);
+        console.log('title' + title);
+        try {
+            var result = document.getElementsByClassName("jawBoneFadeInPlaceContainer")[0].innerHTML;
+            console.log('jawbone container:')
+            console.log(result.length);
+            searchQuery(title);
+        } catch (e) {
+            console.log('empty jawbone')
+        }
         $('.title-card span').unbind().on('click', function() {
-            console.log('clicked ' + title)
-            setTimeout(function() {
-                movieSearch(title, this);
-            }, 1500);
+            searchQuery(title);
         });
-        // $('.close-button').unbind().on('click', function() {
-        //     closeModal()
-        // });
+
+        $(this).on('mouseleave', function(){
+            $(this).unbind()
+        })
+    }).on('mouseleave', function() {
+        // console.log('mouseleave')
+        // $(this).unbind()
+        // closeModal();
     });
-    // $('.slider-item').unbind().on('mouseleave', function() {
-    //     closeModal()
-    // })
     //end doc ready
 });
