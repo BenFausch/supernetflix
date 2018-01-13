@@ -1,47 +1,68 @@
 /**
- * Place your custom CSS styles here.
+ * SNF CUSTOM STYLES
  **/
-body{
-	border:3px solid red!important;
-}
-.title-card span{
-/*	display:block;
-	content:'hola!';
-	color:white;
-	position: relative;
-	z-index: 9999999;
-	height: 10px;
-	width: 100px;
-	clear: both;
-	border: 3px solid blue;*/
-}
 
-
-.snf-ratings, .snf-trailer{
-		font-size:.8em;
+body {
+    border: 3px solid red!important;
+}
+#snf-container {
+    color: white;
+    display:block;
+    height:60px;
+}
+.snf-ratings, .snf-trailer {
+    font-size: .7rem;
+    text-transform: uppercase;
+    
 }
 
-.snf-ratings{
-	margin:0;
+.snf-ratings {
+    margin: 0;
+    color: red;
+    width: 3rem;
+    display: inline-block;
+    font-weight: bold;
+    font-size: .0.6rem;
+    text-align: center;
+    margin: 0px 1%;
+}
+.snf-ratings span {
+    font-weight: bold;
+    color: white;
+    margin: 5px 0;
+    border: 2px solid white;
+    border-radius: 50px;
+    padding: 30% 0;
+    box-sizing: border-box;
+    display: inline-block;
+    text-align: center;
+    width:100%;
+    transition:all 300ms;
+}
+.snf-ratings span:hover{
+	background-color:white;
 	color:red;
 }
-.snf-ratings span{
-	font-weight: bold;
-	color:white;
+.snf-trailer {
+    display: inline;
+    float: left;
+    margin-top: 7px;
+    margin-right:10px;
 }
-.snf-trailer a{
-	border:2px solid white;
-	padding: 5px 10px;
-	font-weight:bold;
-	width: 100px;
-	text-align: center;
-	transition: all 400ms;
-
+.snf-trailer a {
+    border: 1px solid white;
+    padding: 5px 10px;
+    font-weight: bold;
+    text-align: center;
+    transition: all 400ms;
+    width: auto;
+    display: inline-block;
+    margin-top: 0px;
+    vertical-align: middle;
 }
-.snf-trailer a:hover{
-		background:white;
-
+.snf-trailer a:hover {
+    background: white;
 }
-.snf-trailer:hover a{
-	color:black!important;
+.snf-trailer:hover a {
+    color: black!important;
 }
