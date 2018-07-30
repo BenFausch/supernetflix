@@ -139,8 +139,8 @@ var snfMovieSearch = {
     init: function() {
         let title = '';
         let openTitle = '';
-        $(document).on('mouseenter', '.lazy-background-image', function() {
-            let newTitle = $(this).closest('.slider-item').find('.video-preload-title-label').text();
+        $(document).on('mouseenter', '.boxart-image', function() {
+            let newTitle = $(this).next('.fallback-text-container').children('div.fallback-text').text();
             newTitle = newTitle.replace(/ *\([^)]*\) */g, "")
             console.log('title is ' + title + ' , newTitle is ' + newTitle)
             if (newTitle !== title) {
